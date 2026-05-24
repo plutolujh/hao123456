@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hao123456 — 导航站</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0a0a0f;
+            --card: #12121a;
+            --card-hover: #1a1a2e;
+            --border: rgba(0,240,255,0.2);
+            --accent: #00f0ff;
+            --accent-light: #00d4e0;
+            --text: #ffffff;
+            --text-dim: rgba(255,255,255,0.6);
+            --shadow: rgba(0,240,255,0.15);
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 4rem 2rem;
+            transition: background 0.4s ease, color 0.4s ease;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        body::before {
+            left: 0;
+            background: linear-gradient(to bottom,
+                transparent 0%,
+                var(--accent) 20%,
+                var(--accent) 80%,
+                transparent 100%);
+            opacity: 0.4;
+            box-shadow: 0 0 20px var(--accent);
+        }
+
+        body::after {
+            right: 0;
+            background: linear-gradient(to bottom,
+                transparent 0%,
+                var(--accent) 20%,
+                var(--accent) 80%,
+                transparent 100%);
+            opacity: 0.4;
+            box-shadow: 0 0 20px var(--accent);
+        }
+
+        .corner {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            pointer-events: none;
+            z-index: 101;
+        }
+
+        .corner::before,
+        .corner::after {
+            content: '';
+            position: absolute;
+            background: var(--accent);
+            opacity: 0.3;
+        }
+
+        .corner-tl { top: 20px; left: 20px; }
+        .corner-tl::before { width: 30px; height: 2px; top: 0; left: 0; }
+        .corner-tl::after { width: 2px; height: 30px; top: 0; left: 0; }
+
+        .corner-tr { top: 20px; right: 20px; }
+        .corner-tr::before { width: 30px; height: 2px; top: 0; right: 0; }
+        .corner-tr::after { width: 2px; height: 30px; top: 0; right: 0; }
+
+        .corner-bl { bottom: 20px; left: 20px; }
+        .corner-bl::before { width: 30px; height: 2px; bottom: 0; left: 0; }
+        .corner-bl::after { width: 2px; height: 30px; bottom: 0; left: 0; }
+
+        .corner-br { bottom: 20px; right: 20px; }
+        .corner-br::before { width: 30px; height: 2px; bottom: 0; right: 0; }
+        .corner-br::after { width: 2px; height: 30px; bottom: 0; right: 0; }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .control-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .control-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            margin-right: 0.5rem;
+        }
+
+        .control-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .control-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .control-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        header p {
+            color: var(--text-dim);
+        }
+
+        .sites {
+            transition: all 0.4s ease;
+        }
+
+        .layout-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .layout-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .layout-list .site-card {
+            flex-direction: row;
+            align-items: center;
+            padding: 1rem 1.5rem;
+        }
+
+        .layout-list .site-card h2 {
+            margin-bottom: 0;
+            min-width: 200px;
+        }
+
+        .layout-list .site-card p {
+            margin-left: auto;
+        }
+
+        .layout-masonry {
+            columns: 3;
+            column-gap: 1rem;
+        }
+
+        .layout-masonry .site-card {
+            break-inside: avoid;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .layout-masonry { columns: 2; }
+        }
+
+        @media (max-width: 500px) {
+            .layout-masonry { columns: 1; }
+        }
+
+        .layout-compact {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .layout-compact .site-card {
+            padding: 1rem;
+        }
+
+        .layout-compact .site-card h2 { font-size: 0.9rem; }
+        .layout-compact .site-card p { font-size: 0.75rem; }
+
+        .layout-large {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .layout-large .site-card {
+            padding: 2rem;
+        }
+
+        .layout-large .site-card h2 { font-size: 1.2rem; }
+        .layout-large .site-card p { font-size: 1rem; }
+
+        .site-card {
+            display: block;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .site-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 12px;
+            padding: 1px;
+            background: linear-gradient(135deg, var(--accent), transparent, var(--accent));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .site-card:hover::before {
+            opacity: 1;
+        }
+
+        .site-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px var(--shadow);
+            background: var(--card-hover);
+        }
+
+        .site-card h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--accent-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .site-card p {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        .theme-cyberpunk {
+            --bg: #0a0a0f;
+            --card: #12121a;
+            --card-hover: #1a1a2e;
+            --border: rgba(0,240,255,0.2);
+            --accent: #00f0ff;
+            --accent-light: #00d4e0;
+            --text: #ffffff;
+            --text-dim: rgba(255,255,255,0.6);
+            --shadow: rgba(0,240,255,0.15);
+        }
+
+        .theme-forest {
+            --bg: #0d1210;
+            --card: #151d19;
+            --card-hover: #1c2621;
+            --border: rgba(76,175,80,0.2);
+            --accent: #4caf50;
+            --accent-light: #81c784;
+            --text: #e8f5e9;
+            --text-dim: rgba(232,245,233,0.6);
+            --shadow: rgba(76,175,80,0.15);
+        }
+
+        .theme-sunset {
+            --bg: #1a0f0f;
+            --card: #261818;
+            --card-hover: #2f1f1f;
+            --border: rgba(255,152,0,0.2);
+            --accent: #ff9800;
+            --accent-light: #ffb74d;
+            --text: #fff3e0;
+            --text-dim: rgba(255,243,224,0.6);
+            --shadow: rgba(255,152,0,0.15);
+        }
+
+        .theme-midnight {
+            --bg: #0f0f1a;
+            --card: #181828;
+            --card-hover: #1f1f35;
+            --border: rgba(156,39,176,0.2);
+            --accent: #9c27b0;
+            --accent-light: #ba68c8;
+            --text: #f3e5f5;
+            --text-dim: rgba(243,229,245,0.6);
+            --shadow: rgba(156,39,176,0.15);
+        }
+
+        .theme-ocean {
+            --bg: #0a1628;
+            --card: #0f1f35;
+            --card-hover: #142840;
+            --border: rgba(33,150,243,0.2);
+            --accent: #2196f3;
+            --accent-light: #64b5f6;
+            --text: #e3f2fd;
+            --text-dim: rgba(227,242,253,0.6);
+            --shadow: rgba(33,150,243,0.15);
+        }
+
+        .theme-rose {
+            --bg: #1a0f14;
+            --card: #2a1520;
+            --card-hover: #351a28;
+            --border: rgba(233,30,99,0.2);
+            --accent: #e91e63;
+            --accent-light: #f06292;
+            --text: #fce4ec;
+            --text-dim: rgba(252,228,236,0.6);
+            --shadow: rgba(233,30,99,0.15);
+        }
+
+        .theme-minimal {
+            --bg: #f5f5f5;
+            --card: #ffffff;
+            --card-hover: #f0f0f0;
+            --border: rgba(0,0,0,0.08);
+            --accent: #1a1a1a;
+            --accent-light: #333333;
+            --text: #1a1a1a;
+            --text-dim: rgba(26,26,26,0.5);
+            --shadow: rgba(0,0,0,0.08);
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 2rem 1rem; }
+            h1 { font-size: 2rem; }
+            .controls { flex-direction: column; align-items: flex-start; }
+            .control-label { display: none; }
+            .corner { display: none; }
+        }
+    </style>
+</head>
+<body class="theme-cyberpunk">
+    <div class="corner corner-tl"></div>
+    <div class="corner corner-tr"></div>
+    <div class="corner corner-bl"></div>
+    <div class="corner corner-br"></div>
+
+    <div class="container">
+        <div class="controls">
+            <div class="control-group theme-switcher">
+                <span class="control-label">主题</span>
+                <button class="control-btn active" data-theme="cyberpunk">赛博</button>
+                <button class="control-btn" data-theme="forest">森林</button>
+                <button class="control-btn" data-theme="sunset">日落</button>
+                <button class="control-btn" data-theme="midnight">午夜</button>
+                <button class="control-btn" data-theme="ocean">海洋</button>
+                <button class="control-btn" data-theme="rose">玫瑰</button>
+                <button class="control-btn" data-theme="minimal">简约</button>
+            </div>
+            <div class="control-group layout-switcher">
+                <span class="control-label">排版</span>
+                <button class="control-btn active" data-layout="grid">网格</button>
+                <button class="control-btn" data-layout="list">列表</button>
+                <button class="control-btn" data-layout="masonry">瀑布</button>
+                <button class="control-btn" data-layout="compact">紧凑</button>
+                <button class="control-btn" data-layout="large">大卡</button>
+            </div>
+        </div>
+
+        <header>
+            <h1>hao123456.cn</h1>
+            <p>子站导航</p>
+        </header>
+
+        <div class="sites layout-grid" id="sites-container">
+            <a href="https://finance.hao123456.cn" class="site-card">
+                <h2>股市财经</h2>
+                <p>https://finance.hao123456.cn</p>
+            </a>
+
+            <a href="https://xiaohongshu.hao123456.cn" class="site-card">
+                <h2>本地小红书</h2>
+                <p>https://xiaohongshu.hao123456.cn</p>
+            </a>
+
+            <a href="https://dumuqiao.hao123456.cn" class="site-card">
+                <h2>独木桥</h2>
+                <p>https://dumuqiao.hao123456.cn 浙江高考扫盲</p>
+            </a>
+
+            <a href="https://yueliangwan.hao123456.cn" class="site-card">
+                <h2>月亮湾</h2>
+                <p>https://yueliangwan.hao123456.cn 旅游指南</p>
+            </a>
+
+            <a href="https://roster.hao123456.cn" class="site-card">
+                <h2>名单管理</h2>
+                <p>https://roster.hao123456.cn</p>
+            </a>
+
+            <a href="https://badminton.hao123456.cn" class="site-card">
+                <h2>羽毛球</h2>
+                <p>https://badminton.hao123456.cn</p>
+            </a>
+
+            <a href="https://blog.hao123456.cn" class="site-card">
+                <h2>新闻资讯</h2>
+                <p>https://blog.hao123456.cn</p>
+            </a>
+        </div>
+
+        <footer>
+            Powered by Cloudflare Pages
+        </footer>
+    </div>
+
+    <script>
+        const container = document.getElementById('sites-container');
+        const themeBtns = document.querySelectorAll('.theme-switcher .control-btn');
+        const layoutBtns = document.querySelectorAll('.layout-switcher .control-btn');
+
+        themeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.body.className = `theme-${btn.dataset.theme}`;
+                themeBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                localStorage.setItem('hao123456-theme', btn.dataset.theme);
+            });
+        });
+
+        layoutBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                container.className = `sites layout-${btn.dataset.layout}`;
+                layoutBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                localStorage.setItem('hao123456-layout', btn.dataset.layout);
+            });
+        });
+
+        const savedTheme = localStorage.getItem('hao123456-theme');
+        const savedLayout = localStorage.getItem('hao123456-layout');
+
+        if (savedTheme) {
+            document.body.className = `theme-${savedTheme}`;
+            themeBtns.forEach(b => b.classList.toggle('active', b.dataset.theme === savedTheme));
+        }
+
+        if (savedLayout) {
+            container.className = `sites layout-${savedLayout}`;
+            layoutBtns.forEach(b => b.classList.toggle('active', b.dataset.layout === savedLayout));
+        }
+    </script>
+</body>
+</html>
